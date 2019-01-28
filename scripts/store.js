@@ -1,14 +1,10 @@
 /* global Item */
 
 // eslint-disable-next-line no-unused-vars
-const store = (function(){
-  const addItem = function(name) {
-    try {
-      Item.validateName(name);
-      this.items.push(Item.create(name));
-    } catch(e) {
-      console.log(e.message);
-    }
+'use strict';
+const store = (function() {
+  const addItem = function(item) {
+    this.items.push(item);
   };
 
   const findById = function(id) {
@@ -29,7 +25,7 @@ const store = (function(){
       Item.validateName(name);
       const item = this.findById(id);
       item.name = name;
-    } catch(e) {
+    } catch (e) {
       console.log('Cannot update name: ' + e.message);
     }
   };
@@ -59,7 +55,6 @@ const store = (function(){
     findAndUpdateName,
     toggleCheckedFilter,
     setSearchTerm,
-    setItemIsEditing,
+    setItemIsEditing
   };
-  
-}());
+})();
