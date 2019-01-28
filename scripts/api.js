@@ -6,6 +6,16 @@ const api = (function() {
     return fetch(`${BASE_URL}/items`).then(response => response);
   }
 
+  function updateItem(id, updateData){
+    const myHeaders = {
+        'Content-Type': 'application/json'
+      };
+  
+      const myInit = { method: 'PATCH', headers: myHeaders, body: JSON.stringify(updateData) };
+    
+      return fetch(`${BASE_URL}/items/${id}`, myInit);
+  }
+
   function createItem(name) {
     const newItem = JSON.stringify({
       name
@@ -22,6 +32,7 @@ const api = (function() {
 
   return {
     getItems,
-    createItem
+    createItem,
+    updateItem
   };
 })();
