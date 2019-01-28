@@ -53,11 +53,19 @@ const shoppingList = (function() {
     }
 
     // render the shopping list in the DOM
-    console.log('`render` ran');
+
     const shoppingListItemsString = generateShoppingItemsString(items);
 
     // insert that HTML into the DOM
     $('.js-shopping-list').html(shoppingListItemsString);
+
+    if (store.error !== null) {
+      $('.alert').removeClass('hidden');
+      $('#errMsg').html(store.error);
+    } else {
+      $('.alert').addClass('hidden');
+      $('#errMsg').empty();
+    }
   }
 
   function handleNewItemSubmit() {
@@ -67,9 +75,12 @@ const shoppingList = (function() {
       $('.js-shopping-list-entry').val('');
       api
         .createItem(newItemName)
-        .then(res => res.json())
         .then(newItem => {
           store.addItem(newItem);
+          render();
+        })
+        .catch(err => {
+          store.setError(err);
           render();
         });
     });
@@ -85,10 +96,16 @@ const shoppingList = (function() {
     $('.js-shopping-list').on('click', '.js-item-toggle', event => {
       const id = getItemIdFromElement(event.currentTarget);
       const checked = !store.findById(id).checked;
-      api.updateItem(id, { checked: checked }).then(() => {
-        store.findAndUpdate(id, { checked: checked });
-        render();
-      });
+      api
+        .updateItem(id, { checked: checked })
+        .then(() => {
+          store.findAndUpdate(id, { checked: checked });
+          render();
+        })
+        .catch(err => {
+          store.setError(err);
+          render();
+        });
     });
   }
 
@@ -99,10 +116,16 @@ const shoppingList = (function() {
       const id = getItemIdFromElement(event.currentTarget);
       // delete the item
 
-      api.deleteItem(id).then(() => {
-        store.findAndDelete(id);
-        render();
-      });
+      api
+        .deleteItem(id)
+        .then(() => {
+          store.findAndDelete(id);
+          render();
+        })
+        .catch(err => {
+          store.setError(err);
+          render();
+        });
     });
   }
 
@@ -113,11 +136,17 @@ const shoppingList = (function() {
       const itemName = $(event.currentTarget)
         .find('.shopping-item')
         .val();
-      api.updateItem(id, { name: itemName }).then(() => {
-        store.findAndUpdate(id, { name: itemName });
-        store.setItemIsEditing(id, false);
-        render();
-      });
+      api
+        .updateItem(id, { name: itemName })
+        .then(() => {
+          store.findAndUpdate(id, { name: itemName });
+          store.setItemIsEditing(id, false);
+          render();
+        })
+        .catch(err => {
+          store.setError(err);
+          render();
+        });
     });
   }
 
@@ -144,6 +173,13 @@ const shoppingList = (function() {
     });
   }
 
+  function handleClosingErrorAlert() {
+    $('.error-close-btn').on('click', event => {
+      store.clearError();
+      render();
+    });
+  }
+
   function bindEventListeners() {
     handleNewItemSubmit();
     handleItemCheckClicked();
@@ -152,6 +188,7 @@ const shoppingList = (function() {
     handleToggleFilterClick();
     handleShoppingListSearch();
     handleItemStartEditing();
+    handleClosingErrorAlert();
   }
 
   // This object contains the only exposed methods from this module:

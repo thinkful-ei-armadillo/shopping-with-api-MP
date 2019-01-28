@@ -5,8 +5,26 @@ const api = (function() {
     'Content-Type': 'application/json'
   };
 
+  function listApiFetch(...args) {
+    let error = false;
+    return fetch(...args)
+      .then(res => {
+        if (!res.ok) {
+          error = true;
+        }
+
+        return res.json();
+      })
+      .then(data => {
+        if (error) {
+          throw new Error(data.message);
+        }
+        return data;
+      });
+  }
+
   function getItems() {
-    return fetch(`${BASE_URL}/items`).then(response => response);
+    return listApiFetch(`${BASE_URL}/items`);
   }
 
   function updateItem(id, updateData) {
@@ -16,23 +34,21 @@ const api = (function() {
       body: JSON.stringify(updateData)
     };
 
-    return fetch(`${BASE_URL}/items/${id}`, myInit);
+    return listApiFetch(`${BASE_URL}/items/${id}`, myInit);
   }
 
   function createItem(name) {
     const newItem = JSON.stringify({
       name
     });
-
     const myInit = { method: 'POST', headers, body: newItem };
 
-    return fetch(`${BASE_URL}/items`, myInit);
+    return listApiFetch(`${BASE_URL}/items`, myInit);
   }
 
   function deleteItem(id) {
     const myInit = { method: 'DELETE', headers };
-
-    return fetch(`${BASE_URL}/items/${id}`, myInit);
+    return listApiFetch(`${BASE_URL}/items/${id}`, myInit);
   }
 
   return {

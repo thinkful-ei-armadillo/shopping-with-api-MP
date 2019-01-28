@@ -15,10 +15,10 @@ const store = (function() {
     this.items = this.items.filter(item => item.id !== id);
   };
 
-  const findAndUpdate = function(id, newData){
+  const findAndUpdate = function(id, newData) {
     const item = this.findById(id);
     Object.assign(item, newData);
-  }
+  };
 
   const toggleCheckedFilter = function() {
     this.hideCheckedItems = !this.hideCheckedItems;
@@ -33,12 +33,22 @@ const store = (function() {
     this.searchTerm = term;
   };
 
+  const setError = function(err) {
+    this.error = err;
+  };
+
+  const clearError = function() {
+    this.error = null;
+  };
+
   return {
     items: [],
     hideCheckedItems: false,
     searchTerm: '',
-
+    error: null,
     addItem,
+    setError,
+    clearError,
     findById,
     findAndDelete,
     findAndUpdate,
